@@ -31,10 +31,49 @@ import allowlist from 'allowlist'
 
 **Create a list:**
 ```js
+// Allow a good string
+const aList = allowlist('good')
+
+// Allow a good string ignore case
+const aList = allowlist('good', true)
+
+// Allow a better regex
+const aList = allowlist(/better/)
+
+// Allow list of good values
 const aList = allowlist([
     'good',
-    'better'
+    /better/,
+    /best/i
 ])
+
+// Allow good values with your logic
+const aList = allowlist((value) => {
+    return value.includes('good')
+})
+
+// Deny bad values
+const aList = allowlist({
+    reject: [
+        'bad',
+        /awful/,
+        /worse/i
+    ]
+})
+
+// Allow good values and deny bads
+const aList = allowlist({
+    accept: [
+        'good',
+        /better/,
+        /best/i
+    ],
+    reject: [
+        'bad',
+        /awful/,
+        /worse/i
+    ]
+})
 ```
 
 **Check for good:**
