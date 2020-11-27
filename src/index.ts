@@ -1,73 +1,67 @@
-interface AllowList {
-  allow: (value: string) => boolean;
-  accept: (value: string) => boolean;
-  reject: (value: string) => boolean;
-}
-
-type allowFunction = (value: string) => boolean
-type pattern = string | RegExp
-type AllowListObjectOption = Partial<{
-  accept: pattern | pattern[],
-  reject: pattern | pattern[]
+type Matcher<T> = (value: T) => boolean
+type Pattern<T> = T | RegExp
+type AllowListObjectOption<T> = Partial<{
+  accept: Pattern<T> | Pattern<T>[],
+  reject: Pattern<T> | Pattern<T>[]
 }>
-type AllowOptions = AllowListObjectOption | pattern | pattern[] | allowFunction
+type AllowOptions<T> = AllowListObjectOption<T> | Pattern<T> | Pattern<T>[] | Matcher<T>
 
 const REGEX_RULES = [
   { matcher: /[\\$.|*+(){^]/g, replacer: (match: string) => `\\${match}` }
 ]
 
 const regexCache: { [key :string]: RegExp } = {}
-function makeRegex (pattern: string | RegExp, ignorecase: boolean): RegExp {
+function makeRegex<T> (pattern: Pattern<T>, ignorecase: boolean): RegExp {
   if (pattern instanceof RegExp) {
     return pattern
   }
 
-  const cacheKey = pattern + ignorecase
+  const cacheKey = String(pattern) + ignorecase
 
   if (!regexCache[cacheKey]) {
     const source = REGEX_RULES.reduce(
       (prev, { matcher, replacer }) => prev.replace(matcher, replacer),
-      pattern
+      String(pattern)
     )
     regexCache[cacheKey] = new RegExp(source, ignorecase ? 'i' : undefined)
   }
   return regexCache[cacheKey]
 }
 
-function getFunction (options: any, ignorecase: boolean): allowFunction {
+function createMatcher<T> (options: Pattern<T> | Pattern<T>[] | Matcher<T>, ignorecase: boolean = false, matchAll: boolean = false): Matcher<T> {
   if (typeof options === 'function') {
-    return options
+    return options as Matcher<T>
   }
 
   if (Array.isArray(options)) {
     const patterns = options.map(option => makeRegex(option, ignorecase))
-    return (value: string) => {
-      return !!patterns.some(pattern => pattern.test(value))
+    return (value: T) => {
+      const stringValue = String(value)
+      if (matchAll) {
+        return patterns.every(pattern => pattern.test(stringValue))
+      }
+      return patterns.some(pattern => pattern.test(stringValue))
     }
   }
 
-  return getFunction([options], ignorecase)
+  return createMatcher([options], ignorecase, matchAll)
 }
 
-export function allowList (options: AllowOptions, ignorecase: boolean = false): AllowList {
-  const allow = {
-    accept: (_value: string) => true,
-    reject: (_value: string) => false,
-    allow: (value: string) => allow.accept(value) && !allow.reject(value)
-  }
-  if (!options) {
-    return allow
+export function allowList<T> (options: AllowOptions<T>, ignorecase: boolean = false): Matcher<T> {
+  let accept = (_value: T) => true
+  let reject = (_value: T) => false
+
+  if (options) {
+    if (typeof options === 'object' && !(options instanceof RegExp) && !Array.isArray(options)) {
+      const object = options as AllowListObjectOption<T>
+      accept = object.accept ? createMatcher(object.accept, ignorecase) : accept
+      reject = object.reject ? createMatcher(object.reject, ignorecase, true) : reject
+    } else {
+      accept = createMatcher(options, ignorecase)
+    }
   }
 
-  if (typeof options === 'object' && !(options instanceof RegExp) && !Array.isArray(options)) {
-    const object = options as AllowListObjectOption
-    allow.accept = object.accept ? getFunction(object.accept, ignorecase) : allow.accept
-    allow.reject = object.reject ? getFunction(object.reject, ignorecase) : allow.reject
-  } else {
-    allow.accept = getFunction(options, ignorecase)
-  }
-
-  return allow
+  return (value: T) => accept(value) && !reject(value)
 }
 
 export default allowList

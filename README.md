@@ -32,28 +32,28 @@ import allowlist from 'allowlist'
 **Create a list:**
 ```js
 // Allow a good string
-const aList = allowlist('good')
+const allow = allowlist('good')
 
 // Allow a good string ignore case
-const aList = allowlist('good', true)
+const allow = allowlist('good', true)
 
 // Allow a better regex
-const aList = allowlist(/better/)
+const allow = allowlist(/better/)
 
 // Allow list of good values
-const aList = allowlist([
+const allow = allowlist([
     'good',
     /better/,
     /best/i
 ])
 
 // Allow good values with your logic
-const aList = allowlist((value) => {
+const allow = allowlist((value) => {
     return value.includes('good')
 })
 
 // Deny bad values
-const aList = allowlist({
+const allow = allowlist({
     reject: [
         'bad',
         /awful/,
@@ -62,7 +62,7 @@ const aList = allowlist({
 })
 
 // Allow good values and deny bads
-const aList = allowlist({
+const allow = allowlist({
     accept: [
         'good',
         /better/,
@@ -78,7 +78,7 @@ const aList = allowlist({
 
 **Check for good:**
 ```js
-if (aList.allow('Sometimes good things fall apart so better things can fall together.')) {
+if (allow('Sometimes good things fall apart so better things can fall together.')) {
     // cool stuff
 }
 ```
