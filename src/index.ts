@@ -10,22 +10,17 @@ const REGEX_RULES = [
   { matcher: /[\\$.|*+(){^]/g, replacer: (match: string) => `\\${match}` }
 ]
 
-const regexCache: { [key :string]: RegExp } = {}
 function makeRegex (pattern: Pattern, ignorecase: boolean): RegExp {
   if (pattern instanceof RegExp) {
     return pattern
   }
 
-  const cacheKey = pattern + ignorecase
+  const source = REGEX_RULES.reduce(
+    (prev, { matcher, replacer }) => prev.replace(matcher, replacer),
+    pattern
+  )
 
-  if (!regexCache[cacheKey]) {
-    const source = REGEX_RULES.reduce(
-      (prev, { matcher, replacer }) => prev.replace(matcher, replacer),
-      pattern
-    )
-    regexCache[cacheKey] = new RegExp(source, ignorecase ? 'i' : undefined)
-  }
-  return regexCache[cacheKey]
+  return new RegExp(source, ignorecase ? 'i' : undefined)
 }
 
 function createMatcher<T> (options: Pattern | Pattern[] | Matcher<T>, ignorecase: boolean = false, matchAll: boolean = false): Matcher<T> {
