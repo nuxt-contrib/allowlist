@@ -1,34 +1,34 @@
-type Matcher<T> = (value: T) => boolean
-type Pattern<T> = T | RegExp
-type AllowListObjectOption<T> = Partial<{
-  accept: Pattern<T> | Pattern<T>[],
-  reject: Pattern<T> | Pattern<T>[]
+export type Matcher<T> = (value: T) => boolean
+export type Pattern = string | RegExp
+export type AllowRejectOptions = Partial<{
+  accept: Pattern | Pattern[],
+  reject: Pattern | Pattern[]
 }>
-type AllowOptions<T> = AllowListObjectOption<T> | Pattern<T> | Pattern<T>[] | Matcher<T>
+export type Options<T> = AllowRejectOptions | Pattern | Pattern[] | Matcher<T>
 
 const REGEX_RULES = [
   { matcher: /[\\$.|*+(){^]/g, replacer: (match: string) => `\\${match}` }
 ]
 
 const regexCache: { [key :string]: RegExp } = {}
-function makeRegex<T> (pattern: Pattern<T>, ignorecase: boolean): RegExp {
+function makeRegex (pattern: Pattern, ignorecase: boolean): RegExp {
   if (pattern instanceof RegExp) {
     return pattern
   }
 
-  const cacheKey = String(pattern) + ignorecase
+  const cacheKey = pattern + ignorecase
 
   if (!regexCache[cacheKey]) {
     const source = REGEX_RULES.reduce(
       (prev, { matcher, replacer }) => prev.replace(matcher, replacer),
-      String(pattern)
+      pattern
     )
     regexCache[cacheKey] = new RegExp(source, ignorecase ? 'i' : undefined)
   }
   return regexCache[cacheKey]
 }
 
-function createMatcher<T> (options: Pattern<T> | Pattern<T>[] | Matcher<T>, ignorecase: boolean = false, matchAll: boolean = false): Matcher<T> {
+function createMatcher<T> (options: Pattern | Pattern[] | Matcher<T>, ignorecase: boolean = false, matchAll: boolean = false): Matcher<T> {
   if (typeof options === 'function') {
     return options as Matcher<T>
   }
@@ -47,13 +47,13 @@ function createMatcher<T> (options: Pattern<T> | Pattern<T>[] | Matcher<T>, igno
   return createMatcher([options], ignorecase, matchAll)
 }
 
-export function allowList<T> (options: AllowOptions<T>, ignorecase: boolean = false): Matcher<T> {
+export function allowList<T> (options: Options<T>, ignorecase: boolean = false): Matcher<T> {
   let accept = (_value: T) => true
   let reject = (_value: T) => false
 
   if (options) {
     if (typeof options === 'object' && !(options instanceof RegExp) && !Array.isArray(options)) {
-      const object = options as AllowListObjectOption<T>
+      const object = options as AllowRejectOptions
       accept = object.accept ? createMatcher(object.accept, ignorecase) : accept
       reject = object.reject ? createMatcher(object.reject, ignorecase, true) : reject
     } else {
