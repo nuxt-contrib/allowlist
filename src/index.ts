@@ -44,7 +44,7 @@ function createMatcher<T> (options: Pattern | Pattern[] | Matcher<T>, ignorecase
 
 export function allowList<T> (options: Options<T>, ignorecase: boolean = false): Matcher<T> {
   let accept = (_value: T) => true
-  let reject = (_value: T) => false
+  let reject: Matcher<T> | null = null
 
   if (options) {
     if (typeof options === 'object' && !(options instanceof RegExp) && !Array.isArray(options)) {
@@ -56,7 +56,10 @@ export function allowList<T> (options: Options<T>, ignorecase: boolean = false):
     }
   }
 
-  return (value: T) => accept(value) && !reject(value)
+  if (typeof reject === 'function') {
+    return (value: T) => accept(value) && !reject!(value)
+  }
+  return accept
 }
 
 export default allowList
