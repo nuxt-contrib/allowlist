@@ -1,6 +1,6 @@
 {
   "name": "allowlist",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "Create allow/deny matcher with Patterns, Regex and Functions",
   "repository": "nuxt-contrib/allowlist",
   "license": "MIT",
