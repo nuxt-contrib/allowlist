@@ -1,13 +1,19 @@
 export type Matcher<T> = (value: T) => boolean
+
 export type Pattern = string | RegExp
+
 export type AllowRejectOptions = Partial<{
   accept: Pattern | Pattern[],
   reject: Pattern | Pattern[]
 }>
-export type Options<T> = AllowRejectOptions | Pattern | Pattern[] | Matcher<T>
+
+export type AllowlistOptions<T=any> = AllowRejectOptions | Pattern | Pattern[] | Matcher<T>
 
 const REGEX_RULES = [
-  { matcher: /[\\$.|*+(){^]/g, replacer: (match: string) => `\\${match}` }
+  {
+    matcher: /[\\$.|*+(){^]/g,
+    replacer: (match: string) => `\\${match}`
+  }
 ]
 
 function makeRegex (pattern: Pattern, ignorecase: boolean): RegExp {
@@ -42,7 +48,7 @@ function createMatcher<T> (options: Pattern | Pattern[] | Matcher<T>, ignorecase
   return createMatcher([options], ignorecase, matchAll)
 }
 
-export function allowList<T> (options: Options<T>, ignorecase: boolean = false): Matcher<T> {
+export function allowList<T=any> (options: AllowlistOptions<T>, ignorecase: boolean = false): Matcher<T> {
   let accept = (_value: T) => true
   let reject: Matcher<T> | null = null
 
