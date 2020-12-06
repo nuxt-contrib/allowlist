@@ -17,19 +17,22 @@ npm i allowlist
 yarn add allowlist
 ```
 
-Import into your Node.js project:
+Import:
 
 ```js
 // CommonJS
-const allowlist = require('allowlist')
+const { allowlist } = require('allowlist')
 
 // ESM
-import allowlist from 'allowlist'
+import { allowlist } from 'allowlist'
 ```
+
+**Note:** You may need to transpile library!
 
 ## Usage
 
-**Create a list:**
+**Create a matcher:**
+
 ```js
 // Allow a good string
 const allow = allowlist('good')
@@ -76,7 +79,8 @@ const allow = allowlist({
 })
 ```
 
-**Check for good:**
+**Use matcher:**
+
 ```js
 if (allow('Sometimes good things fall apart so better things can fall together.')) {
     // cool stuff
