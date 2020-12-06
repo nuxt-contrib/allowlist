@@ -67,5 +67,3 @@ export function allowList<T=any> (options: AllowlistOptions<T>, ignorecase: bool
   }
   return accept
 }
-
-export default allowList
