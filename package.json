@@ -22,7 +22,6 @@
     "@types/jest": "latest",
     "eslint": "latest",
     "jest": "latest",
-    "rollup-plugin-typescript2": "latest",
     "siroc": "latest",
     "standard-version": "latest",
     "ts-jest": "latest",
