@@ -1,8 +1,4 @@
-import allowList from '../src'
-
-jest.mock('os', () => ({
-  homedir: () => __dirname
-}))
+import { allowList } from '../src'
 
 describe('Single string', () => {
   test('empty string', () => {
