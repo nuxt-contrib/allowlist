@@ -1,6 +1,6 @@
 # Allowlist
 
-> Easy way to allow good values and deny bads
+> Create allow/deny matcher with Patterns, Regex and Functions
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]

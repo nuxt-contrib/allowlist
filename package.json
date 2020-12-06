@@ -1,8 +1,8 @@
 {
   "name": "allowlist",
   "version": "0.0.4",
-  "description": "Allow",
-  "repository": "farnabaz/allowlist",
+  "description": "Create allow/deny matcher with Patterns, Regex and Functions",
+  "repository": "nuxt-contrib/allowlist",
   "license": "MIT",
   "sideEffects": false,
   "main": "dist/index.js",
